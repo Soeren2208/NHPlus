@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class NewTreatmentController {
+public class NewTreatmentPresenter {
 
     @FXML
     private Label labelFirstName;
@@ -41,23 +41,23 @@ public class NewTreatmentController {
     @FXML
     private Button buttonAdd;
 
-    private AllTreatmentController controller;
+    private AllTreatmentPresenter controller;
     private Patient patient;
     private Stage stage;
 
-    public void initialize(AllTreatmentController controller, Stage stage, Patient patient) {
+    public void initialize(AllTreatmentPresenter controller, Stage stage, Patient patient) {
         this.controller= controller;
         this.patient = patient;
         this.stage = stage;
 
         this.buttonAdd.setDisable(true);
         ChangeListener<String> inputNewPatientListener = (observableValue, oldText, newText) ->
-                NewTreatmentController.this.buttonAdd.setDisable(NewTreatmentController.this.areInputDataInvalid());
+                NewTreatmentPresenter.this.buttonAdd.setDisable(NewTreatmentPresenter.this.areInputDataInvalid());
         this.textFieldBegin.textProperty().addListener(inputNewPatientListener);
         this.textFieldEnd.textProperty().addListener(inputNewPatientListener);
         this.textFieldDescription.textProperty().addListener(inputNewPatientListener);
         this.textAreaRemarks.textProperty().addListener(inputNewPatientListener);
-        this.datePicker.valueProperty().addListener((observableValue, localDate, t1) -> NewTreatmentController.this.buttonAdd.setDisable(NewTreatmentController.this.areInputDataInvalid()));
+        this.datePicker.valueProperty().addListener((observableValue, localDate, t1) -> NewTreatmentPresenter.this.buttonAdd.setDisable(NewTreatmentPresenter.this.areInputDataInvalid()));
         this.datePicker.setConverter(new StringConverter<>() {
             @Override
             public String toString(LocalDate localDate) {

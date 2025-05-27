@@ -13,7 +13,7 @@ import de.hitec.nhplus.utils.DateConverter;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-public class TreatmentController {
+public class TreatmentPresenter {
 
     @FXML
     private Label labelPatientName;
@@ -36,12 +36,12 @@ public class TreatmentController {
     @FXML
     private DatePicker datePicker;
 
-    private AllTreatmentController controller;
+    private AllTreatmentPresenter controller;
     private Stage stage;
     private Patient patient;
     private Treatment treatment;
 
-    public void initializeController(AllTreatmentController controller, Stage stage, Treatment treatment) {
+    public void initializeController(AllTreatmentPresenter controller, Stage stage, Treatment treatment) {
         this.stage = stage;
         this.controller= controller;
         PatientDao pDao = DaoFactory.getDaoFactory().createPatientDAO();

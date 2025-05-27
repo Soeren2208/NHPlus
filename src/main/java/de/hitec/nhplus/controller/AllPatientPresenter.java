@@ -23,7 +23,7 @@ import java.time.LocalDate;
 /**
  * The <code>AllPatientController</code> contains the entire logic of the patient view. It determines which data is displayed and how to react to events.
  */
-public class AllPatientController {
+public class AllPatientPresenter {
 
     @FXML
     private TableView<Patient> tableView;
@@ -113,13 +113,13 @@ public class AllPatientController {
         this.tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Patient>() {
             @Override
             public void changed(ObservableValue<? extends Patient> observableValue, Patient oldPatient, Patient newPatient) {;
-                AllPatientController.this.buttonDelete.setDisable(newPatient == null);
+                AllPatientPresenter.this.buttonDelete.setDisable(newPatient == null);
             }
         });
 
         this.buttonAdd.setDisable(true);
         ChangeListener<String> inputNewPatientListener = (observableValue, oldText, newText) ->
-                AllPatientController.this.buttonAdd.setDisable(!AllPatientController.this.areInputDataValid());
+                AllPatientPresenter.this.buttonAdd.setDisable(!AllPatientPresenter.this.areInputDataValid());
         this.textFieldSurname.textProperty().addListener(inputNewPatientListener);
         this.textFieldFirstName.textProperty().addListener(inputNewPatientListener);
         this.textFieldDateOfBirth.textProperty().addListener(inputNewPatientListener);
