@@ -38,6 +38,7 @@ public class Main extends Application {
                 System.exit(0);
             });
         } catch (IOException exception) {
+
             exception.printStackTrace();
         }
     }
