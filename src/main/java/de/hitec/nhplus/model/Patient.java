@@ -22,8 +22,8 @@ public class Patient extends Person {
      * Constructor to initiate an object of class <code>Patient</code> with the given parameter. Use this constructor
      * to initiate objects, which are not persisted yet, because it will not have a patient id (pid).
      *
-     * @param firstName First name of the patient.
-     * @param surname Last name of the patient.
+     * @param firstName   First name of the patient.
+     * @param surname     Last name of the patient.
      * @param dateOfBirth Date of birth of the patient.
      * @param careLevel Care level of the patient.
      * @param roomNumber Room number of the patient.
