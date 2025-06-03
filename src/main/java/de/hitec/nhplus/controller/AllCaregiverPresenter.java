@@ -24,7 +24,7 @@ public class AllCaregiverPresenter {
     private TableView<Caregiver> tableView;
 
     @FXML
-    private TableColumn<Caregiver, Integer> colId;
+    private TableColumn<Caregiver, Integer> colID;
 
     @FXML
     private TableColumn<Caregiver, String> colSurname;
@@ -39,7 +39,7 @@ public class AllCaregiverPresenter {
     private TextField txfSurname;
 
     @FXML
-    private TextField txfFirstName;
+    private TextField txfFirstname;
 
     @FXML
     private TextField txfTelephone;
@@ -61,7 +61,7 @@ public class AllCaregiverPresenter {
     public void initialize() {
         this.readAllAndShowInTableView();
 
-        this.colId.setCellValueFactory(new PropertyValueFactory<>("cgID"));
+        this.colID.setCellValueFactory(new PropertyValueFactory<>("cgID"));
 
         // CellValueFactory to show property values in TableView
         this.colFirstName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
@@ -81,15 +81,17 @@ public class AllCaregiverPresenter {
         this.tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Caregiver>() {
 
             @Override
-            public void changed(ObservableValue<? extends Caregiver> observableValue, Caregiver oldCaregiver, Caregiver newCaregiver) {;
+            public void changed(ObservableValue<? extends Caregiver> observableValue, Caregiver oldCaregiver, Caregiver newCaregiver) {
                 AllCaregiverPresenter.this.btnDelete.setDisable(newCaregiver == null);
             }
         });
 
         this.btnAdd.setDisable(true);
         ChangeListener<String> inputNewCaregiverListener = (observableValue, oldText, newText) ->
+                AllCaregiverPresenter.this.btnAdd.setDisable(!AllCaregiverPresenter.this.areInputDataValid());
+
         this.txfSurname.textProperty().addListener(inputNewCaregiverListener);
-        this.txfFirstName.textProperty().addListener(inputNewCaregiverListener);
+        this.txfFirstname.textProperty().addListener(inputNewCaregiverListener);
         this.txfTelephone.textProperty().addListener(inputNewCaregiverListener);
     }
 
@@ -127,7 +129,7 @@ public class AllCaregiverPresenter {
     }
 
     /**
-     * Updates a patient by calling the method <code>update()</code> of {@link PatientDao}.
+     * Updates a patient by calling the method <code>update()</code> of {@link CaregiverDao}.
      *
      * @param event Event including the changed object and the change.
      */
@@ -154,7 +156,7 @@ public class AllCaregiverPresenter {
     }
 
     /**
-     * This method handles events fired by the button to delete patients. It calls {@link PatientDao} to delete the
+     * This method handles events fired by the button to delete patients. It calls {@link CaregiverDao} to delete the
      * patient from the database and removes the object from the list, which is the data source of the
      * <code>TableView</code>.
      */
@@ -179,7 +181,7 @@ public class AllCaregiverPresenter {
     @FXML
     public void handleAdd() {
         String surname = this.txfSurname.getText();
-        String firstName = this.txfFirstName.getText();
+        String firstName = this.txfFirstname.getText();
         String telephone = this.txfTelephone.getText();
         try {
             this.dao.create(new Caregiver(firstName, surname, telephone));
@@ -194,8 +196,13 @@ public class AllCaregiverPresenter {
      * Clears all contents from all <code>TextField</code>s.
      */
     private void clearTextfields() {
-        this.txfFirstName.clear();
+        this.txfFirstname.clear();
         this.txfSurname.clear();
         this.txfTelephone.clear();
+    }
+
+    private boolean areInputDataValid() {
+        return !this.txfFirstname.getText().isBlank() && !this.txfSurname.getText().isBlank() &&
+                !this.txfTelephone.getText().isBlank();
     }
 }

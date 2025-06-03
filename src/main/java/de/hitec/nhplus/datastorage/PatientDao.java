@@ -158,7 +158,7 @@ public class PatientDao extends DaoImp<Patient> {
     /**
      * Generates a <code>PreparedStatement</code> to delete a patient with the given id.
      *
-     * @param pid Id of the patient to delete.
+     * @param pid id of the patient to delete.
      * @return <code>PreparedStatement</code> to delete patient with the given id.
      */
     @Override
