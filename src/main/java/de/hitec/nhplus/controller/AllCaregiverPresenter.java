@@ -4,8 +4,6 @@ import de.hitec.nhplus.datastorage.CaregiverDao;
 import de.hitec.nhplus.datastorage.DaoFactory;
 import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.model.Caregiver;
-import de.hitec.nhplus.model.Patient;
-import de.hitec.nhplus.utils.DateConverter;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -19,7 +17,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 
 public class AllCaregiverPresenter {
 
@@ -91,7 +88,6 @@ public class AllCaregiverPresenter {
 
         this.btnAdd.setDisable(true);
         ChangeListener<String> inputNewCaregiverListener = (observableValue, oldText, newText) ->
-                AllCaregiverPresenter.this.btnAdd.setDisable(!AllCaregiverPresenter.this.areInputDataValid());
         this.txfSurname.textProperty().addListener(inputNewCaregiverListener);
         this.txfFirstName.textProperty().addListener(inputNewCaregiverListener);
         this.txfTelephone.textProperty().addListener(inputNewCaregiverListener);
@@ -184,13 +180,9 @@ public class AllCaregiverPresenter {
     public void handleAdd() {
         String surname = this.txfSurname.getText();
         String firstName = this.txfFirstName.getText();
-        String birthday = this.textFieldDateOfBirth.getText();
-        LocalDate date = DateConverter.convertStringToLocalDate(birthday);
-        String careLevel = this.txfTelephone.getText();
-        String roomNumber = this.textFieldRoomNumber.getText();
-        String assets = this.textFieldAssets.getText();
+        String telephone = this.txfTelephone.getText();
         try {
-            this.dao.create(new Patient(firstName, surname, date, careLevel, roomNumber, assets));
+            this.dao.create(new Caregiver(firstName, surname, telephone));
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -204,23 +196,6 @@ public class AllCaregiverPresenter {
     private void clearTextfields() {
         this.txfFirstName.clear();
         this.txfSurname.clear();
-        this.textFieldDateOfBirth.clear();
         this.txfTelephone.clear();
-        this.textFieldRoomNumber.clear();
-        this.textFieldAssets.clear();
-    }
-
-    private boolean areInputDataValid() {
-        if (!this.textFieldDateOfBirth.getText().isBlank()) {
-            try {
-                DateConverter.convertStringToLocalDate(this.textFieldDateOfBirth.getText());
-            } catch (Exception exception) {
-                return false;
-            }
-        }
-
-        return !this.txfFirstName.getText().isBlank() && !this.txfSurname.getText().isBlank() &&
-                !this.textFieldDateOfBirth.getText().isBlank() && !this.txfTelephone.getText().isBlank() &&
-                !this.textFieldRoomNumber.getText().isBlank() && !this.textFieldAssets.getText().isBlank();
     }
 }
