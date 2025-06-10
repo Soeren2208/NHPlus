@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -43,10 +44,19 @@ public class AllCaregiverController {
     private CaregiverDao dao;
 
     public void initialize() {
+        this.readAllAndShowInTableView();
+
         this.columnCId.setCellValueFactory(new PropertyValueFactory<>("cid"));
+
         this.columnFirstName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        this.columnFirstName.setCellFactory(TextFieldTableCell.forTableColumn());
+
         this.columnSurName.setCellValueFactory(new PropertyValueFactory<>("surname"));
+        this.columnSurName.setCellFactory(TextFieldTableCell.forTableColumn());
+
         this.columnPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+        this.columnPhoneNumber.setCellFactory(TextFieldTableCell.forTableColumn());
+
         this.columnStatus.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getStatus())
         );
@@ -57,7 +67,8 @@ public class AllCaregiverController {
 
         this.buttonDelete.setDisable(true);
         this.tableView.getSelectionModel().selectedItemProperty().addListener(
-                (observableValue, oldCaregiver, newCaregiver) -> AllCaregiverController.this.buttonDelete.setDisable(newCaregiver == null)
+                (observableValue, oldCaregiver,
+                 newCaregiver) -> AllCaregiverController.this.buttonDelete.setDisable(newCaregiver == null)
         );
         textFieldPhoneNumber.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
@@ -69,6 +80,43 @@ public class AllCaregiverController {
         }));
         readAllAndShowInTableView();
 
+        this.buttonAdd.setDisable(true);
+        textFieldFirstName.textProperty().addListener((observable, oldValue, newValue) -> checkAddButtonState());
+        textFieldSurName.textProperty().addListener((observable, oldValue, newValue) -> checkAddButtonState());
+        textFieldPhoneNumber.textProperty().addListener((observable, oldValue, newValue) -> checkAddButtonState());
+    }
+
+    private void checkAddButtonState() {
+        boolean disable = textFieldFirstName.getText().trim().isEmpty()
+                || textFieldSurName.getText().trim().isEmpty()
+                || textFieldPhoneNumber.getText().trim().isEmpty();
+        buttonAdd.setDisable(disable);
+    }
+
+    @FXML
+    public void handleOnEditFirstname(TableColumn.CellEditEvent<Caregiver, String> event) {
+        event.getRowValue().setFirstName(event.getNewValue());
+        this.doUpdate(event);
+    }
+
+    @FXML
+    public void handleOnEditSurname(TableColumn.CellEditEvent<Caregiver, String> event) {
+        event.getRowValue().setSurname(event.getNewValue());
+        this.doUpdate(event);
+    }
+
+    @FXML
+    public void handleOnEditPhonenumber(TableColumn.CellEditEvent<Caregiver, String> event) {
+        event.getRowValue().setPhoneNumber(event.getNewValue());
+        this.doUpdate(event);
+    }
+
+    private void doUpdate(TableColumn.CellEditEvent<Caregiver, String> event) {
+        try {
+            this.dao.update(event.getRowValue());
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
     }
 
     @FXML
@@ -109,6 +157,7 @@ public class AllCaregiverController {
         this.textFieldFirstName.clear();
         this.textFieldSurName.clear();
         this.textFieldPhoneNumber.clear();
+        checkAddButtonState();
     }
 
     @FXML
