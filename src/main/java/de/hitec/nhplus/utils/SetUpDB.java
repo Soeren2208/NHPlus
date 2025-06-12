@@ -6,8 +6,10 @@ import de.hitec.nhplus.datastorage.PatientDao;
 import de.hitec.nhplus.datastorage.TreatmentDao;
 import de.hitec.nhplus.model.Patient;
 import de.hitec.nhplus.model.Treatment;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -32,8 +34,10 @@ public class SetUpDB {
         SetUpDB.setUpTableCaregiver(connection);
         SetUpDB.setUpTablePatient(connection);
         SetUpDB.setUpTableTreatment(connection);
+        SetUpDB.setUpTableUser(connection);
         SetUpDB.setUpPatients();
         SetUpDB.setUpTreatments();
+        SetUpDB.setUpTestUsers(connection);
     }
 
     /**
@@ -44,6 +48,7 @@ public class SetUpDB {
             statement.execute("DROP TABLE IF EXISTS treatment");
             statement.execute("DROP TABLE IF EXISTS patient");
             statement.execute("DROP TABLE IF EXISTS caregiver");
+            statement.execute("DROP TABLE IF EXISTS user");
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
         }
@@ -99,6 +104,19 @@ public class SetUpDB {
         }
     }
 
+    private static void setUpTableUser(Connection connection) {
+        final String SQL = "CREATE TABLE IF NOT EXISTS user (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "username TEXT NOT NULL UNIQUE, " +
+                "password TEXT NOT NULL" +
+                ");";
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(SQL);
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
 
     private static void setUpPatients() {
         try {
@@ -127,6 +145,18 @@ public class SetUpDB {
             dao.create(new Treatment(14, 4, convertStringToLocalDate("2023-08-24"), convertStringToLocalTime("09:30"), convertStringToLocalTime("10:15"), "KG", "Lympfdrainage"));
             dao.create(new Treatment(16, 6, convertStringToLocalDate("2023-08-31"), convertStringToLocalTime("13:30"), convertStringToLocalTime("13:45"), "Toilettengang", "Hilfe beim Toilettengang; Patientin klagt über Schmerzen beim Stuhlgang. Gabe von Iberogast"));
             dao.create(new Treatment(17, 6, convertStringToLocalDate("2023-09-01"), convertStringToLocalTime("16:00"), convertStringToLocalTime("17:00"), "KG", "Massage der Extremitäten zur Verbesserung der Durchblutung"));
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private static void setUpTestUsers(Connection connection) {
+        final String SQL = "INSERT INTO user (username, password) VALUES (?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(SQL)) {
+            stmt.setString(1, "admin");
+            String hashedPassword = BCrypt.hashpw("admin123", BCrypt.gensalt());
+            stmt.setString(2, hashedPassword);
+            stmt.executeUpdate();
         } catch (SQLException exception) {
             exception.printStackTrace();
         }

@@ -14,6 +14,10 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+/**
+ * The <code>AllCaregiverController</code> manages the caregiver view in the UI.
+ * It handles user interactions, data display, and updates through the {@link CaregiverDao}.
+ */
 public class AllCaregiverController {
     @FXML
     private TableView<Caregiver> tableView;
@@ -43,6 +47,9 @@ public class AllCaregiverController {
     private final ObservableList<Caregiver> caregivers = FXCollections.observableArrayList();
     private CaregiverDao dao;
 
+    /**
+     * Initializes the controller. Sets up the table view, binds columns, configures listeners and loads initial data.
+     */
     public void initialize() {
         this.readAllAndShowInTableView();
 
@@ -86,6 +93,9 @@ public class AllCaregiverController {
         textFieldPhoneNumber.textProperty().addListener((observable, oldValue, newValue) -> checkAddButtonState());
     }
 
+    /**
+     * Enables or disables the Add button based on input field content.
+     */
     private void checkAddButtonState() {
         boolean disable = textFieldFirstName.getText().trim().isEmpty()
                 || textFieldSurName.getText().trim().isEmpty()
@@ -93,25 +103,45 @@ public class AllCaregiverController {
         buttonAdd.setDisable(disable);
     }
 
+    /**
+     * Handles the edit event of the first name column and persists the change.
+     *
+     * @param event the edit event containing the updated caregiver
+     */
     @FXML
     public void handleOnEditFirstname(TableColumn.CellEditEvent<Caregiver, String> event) {
         event.getRowValue().setFirstName(event.getNewValue());
-        this.doUpdate(event);
+        this.handleUpdate(event);
     }
 
+    /**
+     * Handles the edit event of the surname column and persists the change.
+     *
+     * @param event the edit event containing the updated caregiver
+     */
     @FXML
     public void handleOnEditSurname(TableColumn.CellEditEvent<Caregiver, String> event) {
         event.getRowValue().setSurname(event.getNewValue());
-        this.doUpdate(event);
+        this.handleUpdate(event);
     }
 
+    /**
+     * Handles the edit event of the phone number column and persists the change.
+     *
+     * @param event the edit event containing the updated caregiver
+     */
     @FXML
     public void handleOnEditPhonenumber(TableColumn.CellEditEvent<Caregiver, String> event) {
         event.getRowValue().setPhoneNumber(event.getNewValue());
-        this.doUpdate(event);
+        this.handleUpdate(event);
     }
 
-    private void doUpdate(TableColumn.CellEditEvent<Caregiver, String> event) {
+    /**
+     * Persists the changes of a caregiver in the database using {@link CaregiverDao#update(Caregiver)}.
+     *
+     * @param event the event containing the changed caregiver
+     */
+    private void handleUpdate(TableColumn.CellEditEvent<Caregiver, String> event) {
         try {
             this.dao.update(event.getRowValue());
         } catch (SQLException exception) {
@@ -119,6 +149,9 @@ public class AllCaregiverController {
         }
     }
 
+    /**
+     * Handles the Add button action. Creates a new caregiver from input fields and saves it to the database.
+     */
     @FXML
     public void handleAdd() {
         String firstName = this.textFieldFirstName.getText();
@@ -133,6 +166,10 @@ public class AllCaregiverController {
         clearTextfield();
     }
 
+    /**
+     * Loads all caregivers from the database and displays them in the TableView.
+     * Applies filtering based on the selected filter option.
+     */
     private void readAllAndShowInTableView() {
         this.caregivers.clear();
         this.dao = DaoFactory.getDaoFactory().createCaregiverDAO();
@@ -153,6 +190,9 @@ public class AllCaregiverController {
         }
     }
 
+    /**
+     * Clears all input fields and disables the Add button if necessary.
+     */
     private void clearTextfield() {
         this.textFieldFirstName.clear();
         this.textFieldSurName.clear();
@@ -160,13 +200,19 @@ public class AllCaregiverController {
         checkAddButtonState();
     }
 
+    /**
+     * Handles the Delete button action. Marks the selected caregiver as inactive and updates the database.
+     */
     @FXML
     private void handleDelete() {
         Caregiver selected = tableView.getSelectionModel().getSelectedItem();
-        if (selected != null && selected.isActive()) {
-            selected.setInactiveSince(LocalDate.now());
-        }
         if (selected != null) {
+            if (!selected.isActive()) {
+                showInfo("Pflegekraft ist bereits inaktiv: " + selected.getFirstName() + " " + selected.getSurname());
+                return;
+            }
+
+            selected.setInactiveSince(LocalDate.now());
             try {
                 dao.update(selected);
                 readAllAndShowInTableView();
@@ -177,6 +223,11 @@ public class AllCaregiverController {
         }
     }
 
+    /**
+     * Shows an informational dialog with the given message.
+     *
+     * @param message the message to display
+     */
     private void showInfo(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Information");
